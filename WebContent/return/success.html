@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="../js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="../js/commod.js" ></script>
+</head>
+<body>
+	<div id="username">用户名：</div><br>
+   	<div onclick="callUser('all')">在线用户：</div>
+	<div id="users"></div><br>
+	聊天记录：<div id="record"></div><br>
+	<input type="text" id="message">
+	<input id="send" type="button" value="发送" onclick="sendNewMessage()">
+</body>
+<script type="text/javascript">
+	var ws = null;
+	initData();
+</script>
+</html>
