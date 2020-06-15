@@ -24,22 +24,24 @@ public class ChatSocketHandle extends TextWebSocketHandler{
 	
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-		
 		session.getAttributes().put("recipient", "all");//登录默认接受者为all
 		//遍历已登录用户名称集合并打印
 		for(String name : sessions.keySet()){
-			session.sendMessage(new TextMessage(parseName(name)));
+			session.sendMessage(new TextMessage(parseNameAdd(name)));
 		}
 		//获取当前登录名并加入session集合
-		System.out.println(session.getAttributes().keySet());
 		String username = (String) session.getAttributes().get("username");
-		System.out.println(username);
-		sessions.put(username, session);
-		//向所有session会话发出当前用户已登录信息
-		for(WebSocketSession webSocketSession : sessions.values()) {
-			webSocketSession.sendMessage(new TextMessage(parseName(username)));
+		System.out.println(sessions.keySet().contains(username));
+		if(!sessions.keySet().contains(username)){
+			sessions.put(username, session);
+			//向所有session会话发出当前用户已登录信息
+			for(WebSocketSession webSocketSession : sessions.values()) {
+				webSocketSession.sendMessage(new TextMessage(parseNameAdd(username)));
+			}
+			sendMessageFromDB(session);
+		}else {
+			session.sendMessage(new TextMessage(username+"已登录"));
 		}
-		sendMessageFromDB(session);
 		super.afterConnectionEstablished(session);
 	}
 	
@@ -72,15 +74,26 @@ public class ChatSocketHandle extends TextWebSocketHandler{
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
 		// TODO Auto-generated method stub
+		String username = (String) session.getAttributes().get("username");
+		sessions.remove(username);
+		service.addChatRecord(new ChatRecordBean(username, "all", username+"下线了"));
+		for(WebSocketSession socketSession : sessions.values()){
+			socketSession.sendMessage(new TextMessage(parseNameDelete(username)));
+			System.out.println("222222"+parseNameDelete(username));
+		}
 		super.afterConnectionClosed(session, status);
 	}
 	
 	//将用户名转化为页面所需html语句
-	public String parseName(String username) {
-		return "name<div onclick='callUser(&quot;"+username+"&quot;)'>" + username+"</div>";
+	public String parseNameAdd(String username) {
+		return "nameAdd<div id='"+username+"'; onclick='callUser(&quot;"+username+"&quot;)'>" + username+"</div>";
 	}
 	
-	//向所有session会话发出消息
+	public String parseNameDelete(String username) {
+		return "nameDelete"+username;
+	}
+	
+	//发送聊天记录
 	public void sendMessageFromDB(WebSocketSession session) throws IOException {
 		String recipient = (String) session.getAttributes().get("recipient");
 		String username = (String) session.getAttributes().get("username");

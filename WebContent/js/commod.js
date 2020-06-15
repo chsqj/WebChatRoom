@@ -29,12 +29,15 @@ function WebSocketTest(username){
         //接收数据事件
         ws.onmessage = function (evt) 
         { 
-        	if(evt.data.indexOf("name") == 0) {
-        		$("#users").append(evt.data.substring(4));
+        	if(evt.data.indexOf("nameAdd") == 0) {
+        		$("#users").append(evt.data.substring(7));
+        	}else if(evt.data.indexOf("nameDelete") == 0){
+        		$("#"+evt.data.substring(10)).remove();
         	}else if(evt.data.indexOf("record") == 0) {
         		$("#record").append(evt.data.substring(6));
         	}else {
-        		alter("意料外的数据"+evt.data);
+        		alert("意料外的数据"+evt.data);
+        		ws.close();
         	}
         	
         };
@@ -59,4 +62,9 @@ function sendNewMessage() {
 function callUser(username){
 	$("#record").empty();
 	ws.send("recipient : "+username);
+}
+
+//关闭连接
+function quitSession(){
+	ws.close();
 }
