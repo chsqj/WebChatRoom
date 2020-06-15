@@ -31,7 +31,6 @@ public class ChatSocketHandle extends TextWebSocketHandler{
 		}
 		//获取当前登录名并加入session集合
 		String username = (String) session.getAttributes().get("username");
-		System.out.println(sessions.keySet().contains(username));
 		if(!sessions.keySet().contains(username)){
 			sessions.put(username, session);
 			//向所有session会话发出当前用户已登录信息
@@ -48,7 +47,6 @@ public class ChatSocketHandle extends TextWebSocketHandler{
 	@Override
 	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
 		// TODO Auto-generated method stub
-		System.out.println("1111111");
 		String username = (String) session.getAttributes().get("username");
 		String sendMessage = message.getPayload().toString();
 		//为了区分浏览器端发来的消息是要操作用户名集合和消息记录集合
@@ -79,16 +77,16 @@ public class ChatSocketHandle extends TextWebSocketHandler{
 		service.addChatRecord(new ChatRecordBean(username, "all", username+"下线了"));
 		for(WebSocketSession socketSession : sessions.values()){
 			socketSession.sendMessage(new TextMessage(parseNameDelete(username)));
-			System.out.println("222222"+parseNameDelete(username));
 		}
 		super.afterConnectionClosed(session, status);
 	}
 	
-	//将用户名转化为页面所需html语句
+	//用户名添加所需html语句
 	public String parseNameAdd(String username) {
 		return "nameAdd<div id='"+username+"'; onclick='callUser(&quot;"+username+"&quot;)'>" + username+"</div>";
 	}
 	
+	//用户名删除所需html语句
 	public String parseNameDelete(String username) {
 		return "nameDelete"+username;
 	}

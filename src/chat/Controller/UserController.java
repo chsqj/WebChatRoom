@@ -24,7 +24,6 @@ public class UserController {
 	@RequestMapping("/user/record")
 	public ModelAndView record(UserBean user, HttpSession session) {
 		session.setAttribute("username", user.getUsername());//session中放入用户名信息
-		System.out.println(user.getUsername()+"初始化");
 		if(userService.isExist(user)){
 			return new ModelAndView("redirect:/return/success.html?username="+user.getUsername());
 		}else{
