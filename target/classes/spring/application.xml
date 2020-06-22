@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<context:component-scan base-package="chat">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+	<context:property-placeholder location="classpath:mybatis/dbconf.properties"/>
+	<bean id="ds" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="user" value="${user}"></property>
+		<property name="password" value="${password}"></property>
+		<property name="jdbcUrl" value="${jdbcUrl}"></property>
+		<property name="driverClass" value="${driverClass}"></property>
+	</bean> 
+	
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="ds"></property>
+		<property name="configLocation" value="classpath:mybatis/mybatisConf.xml"></property>
+		<property name="mapperLocations" value="classpath:mappers/*.xml"></property>
+	</bean>
+	
+	<bean id="mapperScaner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="chat.Dao"></property>
+		<property name="beanName" value="sqlSession"></property>
+	</bean>
+</beans>
